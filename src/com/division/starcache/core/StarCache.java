@@ -21,15 +21,14 @@ public class StarCache extends JavaPlugin {
     public void onEnable() {
         config = new SCConfig(this);
         config.load();
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, cacheTask, 15120, 15120);
+        this.getServer().getScheduler().runTaskTimer(this, cacheTask, 15120L, 15120L);
         SCListener listen = new SCListener(this);
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+        this.getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override
             public void run() {
                 if (cacheEvent == null || cacheEvent.isActive() == false) {
                     return;
                 }
-                com.massivecraft.factions.FLocation loc = cacheEvent.getEventChunk();
                 Bukkit.getServer().broadcastMessage(String.format(chatFormat, getAnnouncerMessage()));
                 if (cacheEvent.isUnlockStage()) {
                     Bukkit.getServer().broadcastMessage(String.format(chatFormat, "The Cache unlocks in " + (300000 - (System.currentTimeMillis() - cacheEvent.getUnlockStageStart())) / 1000 + " seconds."));
@@ -77,7 +76,6 @@ public class StarCache extends JavaPlugin {
                 }
                 if (args[0].equalsIgnoreCase("info")) {
                     if (cacheEvent != null && cacheEvent.isActive()) {
-                        com.massivecraft.factions.FLocation loc = cacheEvent.getEventChunk();
                         sender.sendMessage(String.format(chatFormat, getAnnouncerMessage()));
                         if (config.getAnnouncerMethod().equalsIgnoreCase("CHUNK")) {
                             sender.sendMessage(ChatColor.YELLOW + "HINT: Multiply the coordinates by 16 and you get the approximate x and z.");

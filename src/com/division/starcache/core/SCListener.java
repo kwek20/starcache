@@ -94,13 +94,13 @@ public class SCListener implements Listener {
                                 player.sendMessage(String.format(StarCache.chatFormat, "The StarCache begins to surge with energy."));
                             }
                         }
-                        sC.getServer().getScheduler().scheduleSyncDelayedTask(sC, new Runnable() {
+                        sC.getServer().getScheduler().runTaskLater(sC, new Runnable() {
                             @Override
                             public void run() {
                                 cacheEvent.clearArea();
                             }
                         }, 80L);
-                        sC.getServer().getScheduler().scheduleSyncDelayedTask(sC, new Runnable() {
+                        sC.getServer().getScheduler().runTaskLater(sC, new Runnable() {
                             @Override
                             public void run() {
                                 if (cacheEvent.isActive()) {
