@@ -59,10 +59,7 @@ public class CacheEvent {
         if (cacheList.size() >= 2) {
             cacheList.get(random.nextInt(cacheList.size())).insertCacheIntoChest(chest);
         } else if (cacheList.size() == 1) {
-            boolean flag = random.nextBoolean();
-            if (flag) {
                 cacheList.get(0).insertCacheIntoChest(chest);
-            }
         } else {
             Bukkit.getServer().broadcastMessage(String.format(StarCache.chatFormat, "Error Code: CL11. Please contact an admin."));
             cacheBlock.setType(Material.AIR);
