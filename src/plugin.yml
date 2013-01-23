@@ -1,6 +1,6 @@
 name: StarCache
 main: com.division.starcache.core.StarCache
-version: 1.5.3DR
+version: 1.5.3RB
 description: Adds a world event that rewards pre-defined items.
 commands:
     starcache:
