@@ -1,0 +1,30 @@
+general:
+  ##################################################
+  #       Time Between each Star Cache Event.      #
+  #             Expressed in Seconds               #
+  ##################################################
+  eventCooldown: 43200
+  ##################################################
+  #        Radius is caclulated in a square        #
+  #        Values will be +- the defined           #
+  ##################################################
+  world:
+    radius: 5000
+  ##################################################
+  #                  DO NOT TOUCH                  #
+  ##################################################
+  lastEvent: 0
+  ##################################################
+  #       Are we using Factions to determine       #
+  #                   safe areas?                  #
+  ##################################################
+  useFactions: true
+  ##################################################
+  #      How should we broadcast coordinates?      #
+  #               By CHUNK or EXACT?               #
+  ##################################################
+  announcer:
+    method: CHUNK
+caches:
+  netherstar:
+  - 399%1

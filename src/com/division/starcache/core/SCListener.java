@@ -1,11 +1,7 @@
 package com.division.starcache.core;
 
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.event.LandClaimEvent;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import org.bukkit.ChatColor;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -29,7 +25,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class SCListener implements Listener {
 
     private StarCache sC;
-    private Map<String, Integer> factionMap = new HashMap<String, Integer>();
+    
 
     public SCListener(StarCache instance) {
         this.sC = instance;
@@ -55,9 +51,9 @@ public class SCListener implements Listener {
         if (cacheEvent == null || !cacheEvent.isActive()) {
             return;
         }
-        FLocation loc = cacheEvent.getEventChunk();
+        Chunk eventChunk = cacheEvent.getEventChunk();
         Chunk chunk = evt.getBlock().getChunk();
-        if (chunk.getX() == loc.getX() && chunk.getZ() == loc.getZ()) {
+        if (chunk == eventChunk) {
             evt.setCancelled(true);
             evt.getPlayer().sendMessage(String.format(StarCache.chatFormat, "You cannot place blocks in the StarCache's chunk."));
         }
@@ -70,12 +66,15 @@ public class SCListener implements Listener {
         }
         Block evtBlock = evt.getClickedBlock();
         final CacheEvent cacheEvent = sC.getCacheEvent();
+        if(cacheEvent == null){
+            return;
+        }
         if (!cacheEvent.isActive()) {
             return;
         }
         if (evtBlock.equals(cacheEvent.getStarCache())) {
             if (!cacheEvent.isUnlockStage()) {
-                cacheEvent.startEvent();
+                cacheEvent.startUnlockStage();
                 sC.getServer().broadcastMessage(String.format(StarCache.chatFormat, evt.getPlayer().getName() + " has initiated the StarCache event. Cache will unlock in 5 minutes."));
                 evt.setCancelled(true);
             } else {
@@ -142,10 +141,10 @@ public class SCListener implements Listener {
         if (cacheEvent == null || !cacheEvent.isActive()) {
             return;
         }
-        FLocation loc = cacheEvent.getEventChunk();
+        Chunk eventChunk = cacheEvent.getEventChunk();
         for (Block b : evt.getBlocks()) {
             Chunk chunk = b.getChunk();
-            if (chunk.getX() == loc.getX() && chunk.getZ() == loc.getZ()) {
+            if (chunk == eventChunk) {
                 evt.setCancelled(true);
                 return;
             }
@@ -162,32 +161,10 @@ public class SCListener implements Listener {
         if (cacheEvent == null || !cacheEvent.isActive()) {
             return;
         }
-        FLocation loc = cacheEvent.getEventChunk();
+        Chunk eventChunk = cacheEvent.getEventChunk();
         Chunk chunkTo = evt.getToBlock().getChunk();
-        if (chunkTo.getX() == loc.getX() && chunkTo.getZ() == loc.getZ()) {
+        if (chunkTo == eventChunk) {
             evt.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onLandClaim(LandClaimEvent evt) {
-        CacheEvent cacheEvent = sC.getCacheEvent();
-        if (cacheEvent == null || !cacheEvent.isActive()) {
-            return;
-        }
-        if (evt.getLocation().equals(cacheEvent.getEventChunk())) {
-            if(factionMap.containsKey(evt.getFaction().getTag())){
-                factionMap.put(evt.getFaction().getTag(), factionMap.get(evt.getFaction().getTag()).intValue()+1);
-                if(factionMap.get(evt.getFaction().getTag())>= 5){
-                    evt.getFaction().sendMessage(ChatColor.GREEN+"*-*StarCache"+ChatColor.YELLOW+" unclaimed ALL of your faction's land.");
-                    evt.getFaction().sendMessage(ChatColor.BLACK+"Just kidding! <3 Shake.");
-                    factionMap.remove(evt.getFaction().getTag());
-                }
-            } else{
-                factionMap.put(evt.getFaction().getTag(), 1);
-            }
-            evt.setCancelled(true);
-            evt.getPlayer().sendMessage(String.format(StarCache.chatFormat, "You cannot claim the StarCache chunk."));
         }
     }
 }

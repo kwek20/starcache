@@ -6,6 +6,7 @@ import com.massivecraft.factions.Factions;
 import java.util.List;
 import java.util.Random;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,7 +25,7 @@ public class CacheEvent {
     private boolean unlockStage = false;
     private long unlockStageStart;
     private Player winner = null;
-    private FLocation eventChunk;
+    private Chunk eventChunk;
     private Block starCache = null;
     private SCConfig config = null;
 
@@ -48,10 +49,12 @@ public class CacheEvent {
         if (cacheBlock.getLocation().getBlockY() >= 230) {
             cacheBlock = getCacheLocation();
         }
-        FLocation factionChunk = new FLocation(cacheBlock);
-        while (Board.getFactionAt(factionChunk) != Factions.i.getNone()) {
-            cacheBlock = getCacheLocation();
-            factionChunk = new FLocation(cacheBlock);
+        Chunk chunk = cacheBlock.getChunk();
+        if (config.isUsingFactions()) {
+            while (Board.getFactionAt(new FLocation(cacheBlock)) != Factions.i.getNone()) {
+                cacheBlock = getCacheLocation();
+                chunk = cacheBlock.getChunk();
+            }
         }
         cacheBlock.setType(Material.CHEST);
         Chest chest = (Chest) cacheBlock.getState();
@@ -59,16 +62,20 @@ public class CacheEvent {
         if (cacheList.size() >= 2) {
             cacheList.get(random.nextInt(cacheList.size())).insertCacheIntoChest(chest);
         } else if (cacheList.size() == 1) {
-                cacheList.get(0).insertCacheIntoChest(chest);
+            cacheList.get(0).insertCacheIntoChest(chest);
         } else {
             Bukkit.getServer().broadcastMessage(String.format(StarCache.chatFormat, "Error Code: CL11. Please contact an admin."));
             cacheBlock.setType(Material.AIR);
             return;
         }
-        this.eventChunk = factionChunk;
+        this.eventChunk = chunk;
         this.starCache = cacheBlock;
         Bukkit.getServer().broadcastMessage(String.format(StarCache.chatFormat, "A StarCache has been placed in chunk: " + eventChunk.getX() + ", " + eventChunk.getZ() + ". Bring armor and defend the objective."));
         this.eventStarted = true;
+    }
+
+    public void startUnlockStage() {
+        this.unlockStage = true;
         this.unlockStageStart = System.currentTimeMillis();
     }
 
@@ -98,12 +105,15 @@ public class CacheEvent {
         contents.getBlockInventory().clear();
         starCache.setType(Material.AIR);
         eventStarted = false;
+        this.unlockStage = false;
+
     }
 
     public void cleanup() {
         Chest cache = (Chest) starCache.getState();
         cache.getBlockInventory().clear();
         starCache.setType(Material.AIR);
+        this.unlockStage = false;
         this.eventStarted = false;
         this.winner = null;
     }
@@ -116,7 +126,7 @@ public class CacheEvent {
         return unlockStage;
     }
 
-    public FLocation getEventChunk() {
+    public Chunk getEventChunk() {
         return eventChunk;
     }
 

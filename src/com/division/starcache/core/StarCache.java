@@ -23,6 +23,15 @@ public class StarCache extends JavaPlugin {
         config.load();
         this.getServer().getScheduler().runTaskTimer(this, cacheTask, 15120L, 15120L);
         SCListener listen = new SCListener(this);
+        if (config.isUsingFactions()) {
+            if (this.getServer().getPluginManager().isPluginEnabled("Factions")) {
+                this.getServer().getPluginManager().registerEvents(new FactionsListener(this), this);
+            } else {
+                this.getServer().getPluginManager().disablePlugin(this);
+                System.out.append("[StarCache] unable to find Factions... Shutting down.");
+                return;
+            }
+        }
         this.getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override
             public void run() {
@@ -39,6 +48,9 @@ public class StarCache extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (cacheEvent == null) {
+            return;
+        }
         if (cacheEvent.isActive()) {
             cacheEvent.abortEvent();
             this.getServer().broadcastMessage(String.format(chatFormat, "The StarCache event has been cancelled due to shutdown."));
@@ -123,8 +135,8 @@ public class StarCache extends JavaPlugin {
     }
 
     public String getAnnouncerMessage() {
-        if (config.getAnnouncerMethod().equalsIgnoreCase("EXACT")) {
-            com.massivecraft.factions.FLocation loc = cacheEvent.getEventChunk();
+        if (config.getAnnouncerMethod().equalsIgnoreCase("CHUNK")) {
+            org.bukkit.Chunk loc = cacheEvent.getEventChunk();
             return "A StarCache is still spawned in chunk: " + loc.getX() + ", " + loc.getZ() + ". Bring armor and defend the objective.";
         } else {
             org.bukkit.Location loc = cacheEvent.getStarCache().getLocation();

@@ -9,26 +9,31 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 /**
- *
+ * 
  * @author Evan
  */
 public class Cache {
 
-    private Map<Integer,Integer> itemMap = new HashMap<Integer,Integer>();
-    
-    public Cache(List<String> entries){
-        for(int i = 0; i < entries.size(); ++i){
-            String raw = entries.get(i);
-            String[] vals = raw.split("%");
-            itemMap.put(Integer.parseInt(vals[0]), Integer.parseInt(vals[1]));
-        }
-    }
-    
-    public void insertCacheIntoChest(Chest chest){
-        Inventory inventory = chest.getBlockInventory();
-        Set<Integer> keys = itemMap.keySet();
-        for(Integer key: keys){
-            inventory.addItem(new ItemStack(key,itemMap.get(key)));
-        }
-    }
+	private Map<String, Integer> itemMap = new HashMap<String, Integer>();
+
+	public Cache(List<String> entries) {
+		for (int i = 0; i < entries.size(); ++i) {
+			String raw = entries.get(i);
+			String[] vals = raw.split("%");
+			itemMap.put(vals[0], Integer.parseInt(vals[1]));
+		}
+	}
+
+	public void insertCacheIntoChest(Chest chest) {
+		Inventory inventory = chest.getBlockInventory();
+		Set<String> keys = itemMap.keySet();
+		for (String key : keys) {
+			String[] split = key.split("#");
+			if (split.length == 1) {
+				inventory.addItem(new ItemStack(Integer.parseInt(split[0]), itemMap.get(key)));
+			} else {
+				inventory.addItem(new ItemStack(Integer.parseInt(split[0]), itemMap.get(key), Short.parseShort(split[1])));
+			}
+		}
+	}
 }

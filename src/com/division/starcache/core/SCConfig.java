@@ -1,7 +1,9 @@
 package com.division.starcache.core;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,11 +21,38 @@ public class SCConfig {
     private long lastEvent;
     private int worldRadius;
     private String announcerMethod;
-    private boolean changed = false;
+    private boolean usingFactions;
     private List<Cache> cacheList = new ArrayList<Cache>();
 
     public SCConfig(StarCache instance) {
+        if (!instance.getDataFolder().exists()) {
+            instance.getDataFolder().mkdirs();
+        }
         configFile = new File(instance.getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            try {
+                configFile.createNewFile();
+                setup();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    private void setup() {
+        try {
+            FileOutputStream fos = new FileOutputStream(configFile);
+            InputStream in = this.getClass().getResourceAsStream("/config.yml");
+            byte[] bytesRec = new byte[4096];
+            int bytes;
+            while ((bytes = in.read(bytesRec, 0, bytesRec.length)) != -1) {
+                fos.write(bytesRec, 0, bytes);
+            }
+            in.close();
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void load() {
@@ -32,26 +61,18 @@ public class SCConfig {
             config.load(configFile);
         } catch (Exception ex) {
             System.out.println("[StarCache] generating config...");
+            setup();
+            load();
+            return;
         }
-
-        if (!config.contains("general.eventCooldown")) {
-            config.set("general.eventCooldown", 43200);
-            changed = true;
+        this.eventCooldown = config.getLong("general.eventCooldown");
+        this.worldRadius = config.getInt("general.world.radius");
+        this.lastEvent = config.getLong("general.lastEvent");
+        this.announcerMethod = config.getString("general.announcer.method");
+        if (config.contains("general.useFactions")) {
+            this.usingFactions = config.getBoolean("general.useFactions");
         } else {
-            this.eventCooldown = config.getLong("general.eventCooldown");
-        }
-        if (!config.contains("general.world.radius")) {
-            config.set("general.world.radius", 0);
-            changed = true;
-        } else {
-            worldRadius = config.getInt("general.world.radius");
-        }
-
-        if (!config.contains("general.lastEvent")) {
-            config.set("general.lastEvent", 0);
-            changed = true;
-        } else {
-            this.lastEvent = config.getLong("general.lastEvent");
+            this.usingFactions = true;
         }
         if (config.contains("caches")) {
             Set<String> caches = config.getConfigurationSection("caches").getKeys(false);
@@ -61,25 +82,6 @@ public class SCConfig {
                 cacheList.add(new Cache(items));
             }
         }
-
-        if (!config.contains("general.announcer.method")) {
-            config.set("general.announcer.method", "EXACT");
-            changed = true;
-        } else {
-            this.announcerMethod = config.getString("general.announcer.method");
-        }
-
-        if (changed) {
-            try {
-                config.save(configFile);
-            } catch (IOException ex) {
-            }
-            changed = false;
-            load();
-        } else {
-            System.out.println("[StarCache] Config loaded...");
-        }
-
     }
 
     public long getLastEvent() {
@@ -102,12 +104,16 @@ public class SCConfig {
     public long getEventCooldown() {
         return eventCooldown;
     }
-    
-    public String getAnnouncerMethod(){
+
+    public String getAnnouncerMethod() {
         return announcerMethod;
     }
 
     public List<Cache> getCacheList() {
         return cacheList;
+    }
+
+    public boolean isUsingFactions() {
+        return usingFactions;
     }
 }

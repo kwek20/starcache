@@ -9,4 +9,4 @@ commands:
       usage: /starcache [start;end;info]
       aliases: [sc]
 authors: [Mastershake71]
-depends: [Factions]
+softdepends: [Factions]
