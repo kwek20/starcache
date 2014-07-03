@@ -1,0 +1,12 @@
+name: StarCache
+main: com.division.starcache.core.StarCache
+version: 1.5.3RB
+description: Adds a world event that rewards pre-defined items.
+commands:
+    starcache:
+      permission: starcache.starcache
+      description: Control the StarCache event.
+      usage: /starcache [start;end;info]
+      aliases: [sc]
+authors: [Mastershake71]
+softdepends: [Factions]

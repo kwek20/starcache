@@ -1,8 +1,10 @@
 package com.division.starcache.core;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.entity.BoardColls;
+import com.massivecraft.factions.entity.Faction;
+import com.massivecraft.factions.entity.FactionColls;
+import com.massivecraft.mcore.ps.PS;
+
 import java.util.List;
 import java.util.Random;
 import org.bukkit.Bukkit;
@@ -41,7 +43,7 @@ public class CacheEvent {
         double minZ = -radius;
         int x = (int) (random.nextInt((int) (maxX - minX)) + minX);
         int z = (int) (random.nextInt((int) (maxZ - minZ)) + minZ);
-        return Bukkit.getServer().getWorld("world").getHighestBlockAt(x, z);
+        return Bukkit.getServer().getWorld(config.getWorldName()).getHighestBlockAt(x, z);
     }
 
     public void startEvent() {
@@ -50,12 +52,15 @@ public class CacheEvent {
             cacheBlock = getCacheLocation();
         }
         Chunk chunk = cacheBlock.getChunk();
+        
         if (config.isUsingFactions()) {
-            while (Board.getFactionAt(new FLocation(cacheBlock)) != Factions.i.getNone()) {
-                cacheBlock = getCacheLocation();
+    		Faction none = FactionColls.get().getForWorld(config.getWorldName()).getNone();
+        	while (BoardColls.get().getFactionAt(PS.valueOf(cacheBlock.getLocation())) != none){
+        		cacheBlock = getCacheLocation();
                 chunk = cacheBlock.getChunk();
-            }
+        	}
         }
+        
         cacheBlock.setType(Material.CHEST);
         Chest chest = (Chest) cacheBlock.getState();
         List<Cache> cacheList = config.getCacheList();

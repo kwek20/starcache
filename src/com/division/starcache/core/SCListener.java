@@ -73,7 +73,7 @@ public class SCListener implements Listener {
             return;
         }
         if (evtBlock.equals(cacheEvent.getStarCache())) {
-            if (!cacheEvent.isUnlockStage()) {
+            if (!cacheEvent.isUnlockStage() && cacheEvent.getEventWinner() == null) {
                 cacheEvent.startUnlockStage();
                 sC.getServer().broadcastMessage(String.format(StarCache.chatFormat, evt.getPlayer().getName() + " has initiated the StarCache event. Cache will unlock in 5 minutes."));
                 evt.setCancelled(true);

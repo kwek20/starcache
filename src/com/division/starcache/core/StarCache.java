@@ -22,9 +22,10 @@ public class StarCache extends JavaPlugin {
         config = new SCConfig(this);
         config.load();
         this.getServer().getScheduler().runTaskTimer(this, cacheTask, 15120L, 15120L);
-        SCListener listen = new SCListener(this);
+        new SCListener(this);
+        
         if (config.isUsingFactions()) {
-            if (this.getServer().getPluginManager().isPluginEnabled("Factions")) {
+            if (this.getServer().getPluginManager().getPlugin("Factions") != null) {
                 this.getServer().getPluginManager().registerEvents(new FactionsListener(this), this);
             } else {
                 this.getServer().getPluginManager().disablePlugin(this);
@@ -32,6 +33,7 @@ public class StarCache extends JavaPlugin {
                 return;
             }
         }
+        
         this.getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override
             public void run() {
@@ -40,7 +42,8 @@ public class StarCache extends JavaPlugin {
                 }
                 Bukkit.getServer().broadcastMessage(String.format(chatFormat, getAnnouncerMessage()));
                 if (cacheEvent.isUnlockStage()) {
-                    Bukkit.getServer().broadcastMessage(String.format(chatFormat, "The Cache unlocks in " + (300000 - (System.currentTimeMillis() - cacheEvent.getUnlockStageStart())) / 1000 + " seconds."));
+                	long sec = (300000 - (System.currentTimeMillis() - cacheEvent.getUnlockStageStart())) / 1000;
+                    Bukkit.getServer().broadcastMessage(String.format(chatFormat, sec <=0 ? "The Cache is unlocked!" : "The Cache unlocks in " + sec + " seconds."));
                 }
             }
         }, 1800L, 1800L);
@@ -87,7 +90,7 @@ public class StarCache extends JavaPlugin {
                     }
                 }
                 if (args[0].equalsIgnoreCase("info")) {
-                    if (cacheEvent != null && cacheEvent.isActive()) {
+                    if (cacheEvent != null && cacheEvent.isActive() && cacheEvent.getEventWinner() == null) {
                         sender.sendMessage(String.format(chatFormat, getAnnouncerMessage()));
                         if (config.getAnnouncerMethod().equalsIgnoreCase("CHUNK")) {
                             sender.sendMessage(ChatColor.YELLOW + "HINT: Multiply the coordinates by 16 and you get the approximate x and z.");
@@ -96,7 +99,7 @@ public class StarCache extends JavaPlugin {
                             sender.sendMessage(String.format(chatFormat, "The Cache unlocks in " + (300000 - (System.currentTimeMillis() - cacheEvent.getUnlockStageStart())) / 1000 + " seconds."));
                         }
                     } else {
-                        sender.sendMessage(String.format(chatFormat, "The next StarCache will occur in about" + (((config.getLastEvent() + (config.getEventCooldown() * 1000)) - System.currentTimeMillis()) / 1000) + " seconds."));
+                        sender.sendMessage(String.format(chatFormat, "The next StarCache will occur in about " + (((config.getLastEvent() + (config.getEventCooldown() * 1000)) - System.currentTimeMillis()) / 1000) + " seconds."));
                     }
 
                 }

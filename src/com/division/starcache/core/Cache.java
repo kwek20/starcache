@@ -1,11 +1,11 @@
 package com.division.starcache.core;
 
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Random;
+
+import org.bukkit.Material;
 import org.bukkit.block.Chest;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -14,26 +14,21 @@ import org.bukkit.inventory.ItemStack;
  */
 public class Cache {
 
-	private Map<String, Integer> itemMap = new HashMap<String, Integer>();
+	private Random r = new Random();
+	private List<ItemStack> items = new LinkedList<ItemStack>();
 
-	public Cache(List<String> entries) {
-		for (int i = 0; i < entries.size(); ++i) {
-			String raw = entries.get(i);
-			String[] vals = raw.split("%");
-			itemMap.put(vals[0], Integer.parseInt(vals[1]));
-		}
+	public Cache(List<ItemStack> entries) {
+		items.addAll(entries);
 	}
 
-	public void insertCacheIntoChest(Chest chest) {
-		Inventory inventory = chest.getBlockInventory();
-		Set<String> keys = itemMap.keySet();
-		for (String key : keys) {
-			String[] split = key.split("#");
-			if (split.length == 1) {
-				inventory.addItem(new ItemStack(Integer.parseInt(split[0]), itemMap.get(key)));
-			} else {
-				inventory.addItem(new ItemStack(Integer.parseInt(split[0]), itemMap.get(key), Short.parseShort(split[1])));
+	public void insertCacheIntoChest(Chest c) {
+		for (ItemStack i : items){
+			int random = r.nextInt(27);
+			while (c.getBlockInventory().getItem(random) != null && !c.getBlockInventory().getItem(random).getType().equals(Material.AIR)){
+				random = r.nextInt(27);
 			}
+			
+			c.getBlockInventory().setItem(random, i);
 		}
 	}
 }

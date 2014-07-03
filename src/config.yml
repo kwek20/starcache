@@ -10,6 +10,10 @@ general:
   ##################################################
   world:
     radius: 5000
+    ##################################################
+    #             What world are we using?           #
+    ##################################################
+    name: world
   ##################################################
   #                  DO NOT TOUCH                  #
   ##################################################
@@ -27,4 +31,37 @@ general:
     method: CHUNK
 caches:
   netherstar:
-  - 399%1
+  - ==: org.bukkit.inventory.ItemStack
+    type: NETHER_STAR
+    amount: 1
+  - ==: org.bukkit.inventory.ItemStack
+    type: DIRT
+    amount: 34
+  sword:
+  - ==: org.bukkit.inventory.ItemStack
+    type: DIAMOND_SWORD
+    damage: 99
+    amount: 1
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: Pointy pike
+      lore:
+      - Cant touch me nana!
+      enchants:
+        DAMAGE_ALL: 6
+  jukebox:
+  - ==: org.bukkit.inventory.ItemStack
+    type: JUKEBOX
+    damage: 5
+    amount: 10
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: Test
+      lore:
+      - LOL
+      - TEST
+      enchants:
+        DIG_SPEED: 5
+        ARROW_DAMAGE: 1
